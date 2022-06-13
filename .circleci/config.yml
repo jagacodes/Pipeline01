@@ -60,7 +60,7 @@ workflows:
   jagaWorkflow:
     jobs:
       - create_infrastructure
-      - get_server_pubIP
+      - get_server_pubIP:
           requires:
             - create_infrastructure
       - configure_infrastructure:
