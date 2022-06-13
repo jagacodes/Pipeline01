@@ -27,8 +27,8 @@ jobs:
       - run: 
           name: Echo Server PubIP to the Inventory File
           command: |
-            echo [all] > Pipeline01/inventory
-            aws ec2 describe-instances         --query 'Reservations[*].Instances[*].PublicIpAddress'       --filters "Name=tag:Project Values=udacity"       --output text >> Pipeline01/inventory
+            echo [all] > inventory
+            aws ec2 describe-instances         --query 'Reservations[*].Instances[*].PublicIpAddress'       --filters "Name=tag:Project Values=udacity"       --output text >> inventory
 
   
   configure_infrastructure: 
@@ -57,13 +57,14 @@ workflows:
   # Name the workflow
   jagaWorkflow:
     jobs:
-      - create_infrastructure
-      - get_pubip:
-          requires:
-            - create_infrastructure
-      - configure_infrastructure:
-          requires:
-            - get_pubip
+      #- create_infrastructure
+     # - get_pubip:
+          #requires:
+            #- create_infrastructure
+      #- configure_infrastructure:
+          #requires:
+            #- get_pubip
+      - configure_infrastructure
       
     
 
