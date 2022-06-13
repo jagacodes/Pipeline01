@@ -27,7 +27,8 @@ jobs:
       - run: 
           name: Echo Server PubIP to the Inventory File
           command: |
-            aws ec2 describe-instances         --query 'Reservations[*].Instances[*].PublicIpAddress'       --filters "Name=tag:Project Values=udacity"       --output text >> inventory
+            echo [all] > Pipeline01/inventory
+            aws ec2 describe-instances         --query 'Reservations[*].Instances[*].PublicIpAddress'       --filters "Name=tag:Project Values=udacity"       --output text >> Pipeline01/inventory
 
   
   configure_infrastructure: 
@@ -41,10 +42,10 @@ jobs:
       - run:
           name: Install Ansible
           command: |
-            sudo yum update
-            sudo amazon-linux-extras list | grep ansible2
-            sudo amazon-linux-extras enable ansible2
-            sudo yum install -y ansible
+            yum update
+            amazon-linux-extras list | grep ansible2
+            amazon-linux-extras enable ansible2
+            yum install -y ansible
 
       - run:
           name: Run Playbook and Configure server
