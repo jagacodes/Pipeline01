@@ -8,7 +8,7 @@ orbs:
 jobs:
   create_infrastructure: 
     docker:
-      - image: amazon/aws-cli
+      - image: amazon/aws-cli cx
     steps:
       - checkout
       - run:
@@ -18,11 +18,54 @@ jobs:
             --template-file template.yml \
             --stack-name myStack-${CIRCLE_WORKFLOW_ID:0:5} \
             --region us-east-1
+
+  get_server_pubIP:
+    docker:
+      - image: amazon/aws-cli
+    setup: 
+      - checkout
+      - run: 
+        name: Echo Server PubIP to Inventory File
+        command: |
+          aws ec2 describe-instances \        
+          --query 'Reservations[*].Instances[*].PublicIpAddress' \       
+          --filters "Name=tag:Project,Values=udacity" \       
+          --output text >> inventory
+
+  
+  configure_infrastructure: 
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - add_ssh_keys:
+            # You can get this ID in the section where you registered the SSH Key
+            fingerprints: ["59:ed:ea:cf:01:4f:53:bf:4d:3c:8e:46:68:22:c6:89"] 
+    - run:
+        name: Install Ansible
+        command: |
+          sudo yum update
+          sudo amazon-linux-extras list | grep ansible2
+          sudo amazon-linux-extras enable ansible2
+          sudo yum install -y ansible
+
+    - run:
+        name: Run Playbook and Configure server
+        command: |
+          ansible-playbook -i inventory main.yml
+
 # Sequential workflow
 workflows:
   # Name the workflow
   jagaWorkflow:
     jobs:
       - create_infrastructure
+      - get_server_pubIP
+          requires:
+            - create_infrastructure
+      - configure_infrastructure:
+          requires:
+            - get_server_pubIP
+      
     
 
