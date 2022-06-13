@@ -25,7 +25,7 @@ jobs:
     steps: 
       - checkout
       - run: 
-          name: Echo Server PubIP to Inventory File
+          name: Echo Server PubIP to the Inventory File
           command: |
             aws ec2 describe-instances \        
             --query 'Reservations[*].Instances[*].PublicIpAddress' \       
