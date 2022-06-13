@@ -25,12 +25,12 @@ jobs:
     steps: 
       - checkout
       - run: 
-        name: Echo Server PubIP to Inventory File
-        command: |
-          aws ec2 describe-instances \        
-          --query 'Reservations[*].Instances[*].PublicIpAddress' \       
-          --filters "Name=tag:Project,Values=udacity" \       
-          --output text >> inventory
+          name: Echo Server PubIP to Inventory File
+          command: |
+            aws ec2 describe-instances \        
+            --query 'Reservations[*].Instances[*].PublicIpAddress' \       
+            --filters "Name=tag:Project,Values=udacity" \       
+            --output text >> inventory
 
   
   configure_infrastructure: 
