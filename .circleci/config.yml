@@ -19,7 +19,7 @@ jobs:
             --stack-name myStack-${CIRCLE_WORKFLOW_ID:0:5} \
             --region us-east-1
 
-  get_server_pubIP:
+  get_pubip:
     docker:
       - image: amazon/aws-cli
     steps: 
@@ -60,12 +60,12 @@ workflows:
   jagaWorkflow:
     jobs:
       - create_infrastructure
-      - get_server_pubIP:
+      - get_pubip:
           requires:
             - create_infrastructure
       - configure_infrastructure:
           requires:
-            - get_server_pubIP
+            - get_pubip
       
     
 
