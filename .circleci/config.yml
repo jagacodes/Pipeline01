@@ -22,7 +22,7 @@ jobs:
   get_server_pubIP:
     docker:
       - image: amazon/aws-cli
-    setup: 
+    steps: 
       - checkout
       - run: 
         name: Echo Server PubIP to Inventory File
@@ -41,18 +41,18 @@ jobs:
       - add_ssh_keys:
             # You can get this ID in the section where you registered the SSH Key
             fingerprints: ["59:ed:ea:cf:01:4f:53:bf:4d:3c:8e:46:68:22:c6:89"] 
-    - run:
-        name: Install Ansible
-        command: |
-          sudo yum update
-          sudo amazon-linux-extras list | grep ansible2
-          sudo amazon-linux-extras enable ansible2
-          sudo yum install -y ansible
+      - run:
+          name: Install Ansible
+          command: |
+            sudo yum update
+            sudo amazon-linux-extras list | grep ansible2
+            sudo amazon-linux-extras enable ansible2
+            sudo yum install -y ansible
 
-    - run:
-        name: Run Playbook and Configure server
-        command: |
-          ansible-playbook -i inventory main.yml
+      - run:
+          name: Run Playbook and Configure server
+          command: |
+            ansible-playbook -i inventory main.yml
 
 # Sequential workflow
 workflows:
