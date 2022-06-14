@@ -35,7 +35,7 @@ jobs:
             cd ~/app
             touch inventory
             echo [all] > inventory
-            aws ec2 describe-instances         --query 'Reservations[*].Instances[*].PublicIpAddress'       --filters "Name=tag:Project Values=udacity"       --output text >> inventory  
+            aws ec2 describe-instances         --query 'Reservations[*].Instances[*].PublicIpAddress'       --filters "Name=instance-state-name,Values=running"       --output text >> inventory 
             cat inventory
       - persist_to_workspace:
           root: ~/app
