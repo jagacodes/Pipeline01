@@ -19,40 +19,12 @@ jobs:
             --stack-name myStack-${CIRCLE_WORKFLOW_ID:0:5} \
             --region us-east-1
 
-  get_pubip:
-    docker:
-      - image: amazon/aws-cli
-    working_directory: ~/
-    steps: 
-      - checkout
-      - run:
-          name: Install tar utility
-          command: |
-            yum install -y tar gzip
-      - run: 
-          name: Echo Server PubIP to the Inventory File
-          command: |
-            cd ~/
-            touch inventory
-            echo [all] > inventory
-            aws ec2 describe-instances         --query 'Reservations[*].Instances[*].PublicIpAddress'       --filters "Name=instance-state-name,Values=running"       --output text >> inventory 
-            cat inventory
-      - persist_to_workspace:
-          root: ~/
-          paths:
-            - ./*
   
   configure_infrastructure: 
     docker:
       - image: amazon/aws-cli
     steps:
       - checkout
-      - run:
-          name: Install tar utility
-          command: |
-            yum install -y tar gzip
-      - attach_workspace:
-          at: ~/
       - add_ssh_keys:
             # You can get this ID in the section where you registered the SSH Key
             fingerprints: ["59:ed:ea:cf:01:4f:53:bf:4d:3c:8e:46:68:22:c6:89"] 
@@ -63,24 +35,40 @@ jobs:
             amazon-linux-extras list | grep ansible2
             amazon-linux-extras enable ansible2
             yum install -y ansible
+      
 
       - run:
           name: Run Playbook and Configure server
           command: |
-            ansible-playbook -i ~/inventory main.yml
+            ansible-playbook -i inventory main.yml
+
+  smoke_test:
+    docker:
+      - image: alpine:latest
+    steps:
+      - run: apk add --update curl
+      - run:
+          name: smoke test
+          command: |
+            URL="https://blog.udacity.com/"
+            # Test if website exists
+            if curl -s --head ${URL} 
+            then
+              return 0
+            else
+              return 1
+            fi
 
 # Sequential workflow
 workflows:
   # Name the workflow
   jagaWorkflow:
     jobs:
-      - create_infrastructure
-      - get_pubip:
-          requires:
-            - create_infrastructure
-      - configure_infrastructure:
-          requires:
-            - get_pubip
+      - smoke_test
+      #- create_infrastructure
+      #- configure_infrastructure:
+          #requires:
+            #- create_infrastructure
    
       
     
