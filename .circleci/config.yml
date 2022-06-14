@@ -28,7 +28,11 @@ jobs:
           name: Echo Server PubIP to the Inventory File
           command: |
             echo [all] > inventory
-            aws ec2 describe-instances         --query 'Reservations[*].Instances[*].PublicIpAddress'       --filters "Name=tag:Project Values=udacity"       --output text >> inventory
+            aws ec2 describe-instances         --query 'Reservations[*].Instances[*].PublicIpAddress'       --filters "Name=tag:Project Values=udacity"       --output text >> inventory  
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            -  inventory
 
   
   configure_infrastructure: 
@@ -36,6 +40,8 @@ jobs:
       - image: amazon/aws-cli
     steps:
       - checkout
+      - attach_workspace:
+          at: .
       - add_ssh_keys:
             # You can get this ID in the section where you registered the SSH Key
             fingerprints: ["59:ed:ea:cf:01:4f:53:bf:4d:3c:8e:46:68:22:c6:89"] 
@@ -50,21 +56,21 @@ jobs:
       - run:
           name: Run Playbook and Configure server
           command: |
-            ansible-playbook -i inventory main.yml
+            ansible-playbook -i ~/inventory main.yml
 
 # Sequential workflow
 workflows:
   # Name the workflow
   jagaWorkflow:
     jobs:
-      #- create_infrastructure
-     # - get_pubip:
-          #requires:
-            #- create_infrastructure
-      #- configure_infrastructure:
-          #requires:
-            #- get_pubip
-      - configure_infrastructure
+      - create_infrastructure
+      - get_pubip:
+          requires:
+            - create_infrastructure
+      - configure_infrastructure:
+          requires:
+            - get_pubip
+   
       
     
 
