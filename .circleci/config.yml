@@ -24,6 +24,10 @@ jobs:
       - image: amazon/aws-cli
     steps: 
       - checkout
+      - run:
+          name: Install tar utility
+          command: |
+            yum install -y tar gzip
       - run: 
           name: Echo Server PubIP to the Inventory File
           command: |
