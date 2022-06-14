@@ -22,6 +22,7 @@ jobs:
   get_pubip:
     docker:
       - image: amazon/aws-cli
+    working_directory: ~/
     steps: 
       - checkout
       - run:
@@ -51,7 +52,7 @@ jobs:
           command: |
             yum install -y tar gzip
       - attach_workspace:
-          at: .
+          at: ~/
       - add_ssh_keys:
             # You can get this ID in the section where you registered the SSH Key
             fingerprints: ["59:ed:ea:cf:01:4f:53:bf:4d:3c:8e:46:68:22:c6:89"] 
@@ -66,7 +67,7 @@ jobs:
       - run:
           name: Run Playbook and Configure server
           command: |
-            ansible-playbook -i ~/inventory main.yml
+            ansible-playbook -i inventory main.yml
 
 # Sequential workflow
 workflows:
