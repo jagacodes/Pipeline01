@@ -46,8 +46,12 @@ jobs:
       - image: amazon/aws-cli
     steps:
       - checkout
+       - run:
+          name: Install tar utility
+          command: |
+            yum install -y tar gzip
       - attach_workspace:
-          at: .
+          at: ~/
       - add_ssh_keys:
             # You can get this ID in the section where you registered the SSH Key
             fingerprints: ["59:ed:ea:cf:01:4f:53:bf:4d:3c:8e:46:68:22:c6:89"] 
