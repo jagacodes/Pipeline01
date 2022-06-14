@@ -22,7 +22,6 @@ jobs:
   get_pubip:
     docker:
       - image: amazon/aws-cli
-    working_directory: ~/app
     steps: 
       - checkout
       - run:
@@ -32,13 +31,13 @@ jobs:
       - run: 
           name: Echo Server PubIP to the Inventory File
           command: |
-            cd ~/app
+            cd ~/
             touch inventory
             echo [all] > inventory
             aws ec2 describe-instances         --query 'Reservations[*].Instances[*].PublicIpAddress'       --filters "Name=instance-state-name,Values=running"       --output text >> inventory 
             cat inventory
       - persist_to_workspace:
-          root: ~/app
+          root: ~/
           paths:
             - ./*
   
@@ -67,7 +66,7 @@ jobs:
       - run:
           name: Run Playbook and Configure server
           command: |
-            ansible-playbook -i ~/app/inventory main.yml
+            ansible-playbook -i ~/inventory main.yml
 
 # Sequential workflow
 workflows:
