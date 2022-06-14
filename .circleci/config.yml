@@ -22,6 +22,7 @@ jobs:
   get_pubip:
     docker:
       - image: amazon/aws-cli
+    working_directory: ~/app
     steps: 
       - checkout
       - run:
@@ -31,14 +32,14 @@ jobs:
       - run: 
           name: Echo Server PubIP to the Inventory File
           command: |
-            cd ~/
+            cd ~/app
             touch inventory
-            echo [all] > ~/inventory
-            aws ec2 describe-instances         --query 'Reservations[*].Instances[*].PublicIpAddress'       --filters "Name=tag:Project Values=udacity"       --output text >> ~/inventory  
+            echo [all] > inventory
+            aws ec2 describe-instances         --query 'Reservations[*].Instances[*].PublicIpAddress'       --filters "Name=tag:Project Values=udacity"       --output text >> inventory  
       - persist_to_workspace:
-          root: ~/
+          root: ~/app
           paths:
-            - inventory
+            - ./*
   
   configure_infrastructure: 
     docker:
@@ -65,7 +66,7 @@ jobs:
       - run:
           name: Run Playbook and Configure server
           command: |
-            ansible-playbook -i ~/inventory main.yml
+            ansible-playbook -i ~/app/inventory main.yml
 
 # Sequential workflow
 workflows:
